@@ -1627,113 +1627,88 @@ void Discret::Elements::ScaTraEleBoundaryCalc<distype, probdim>::calc_robin_boun
     Core::LinAlg::SerialDenseMatrix& elemat1, Core::LinAlg::SerialDenseVector& elevec1,
     const double scalar)
 {
-  //////////////////////////////////////////////////////////////////////
-  //              get current condition and parameters
-  //////////////////////////////////////////////////////////////////////
-
-  // get current condition
-  const Core::Conditions::Condition* cond =
-      params.get<const Core::Conditions::Condition*>("condition");
+  const auto* const cond = params.get<const Core::Conditions::Condition*>("condition");
   if (cond == nullptr) FOUR_C_THROW("Cannot access condition 'TransportRobin'");
 
-  // get on/off flags
-  const auto onoff = cond->parameters().get<std::vector<int>>("ONOFF");
+  const auto* const onoff = &cond->parameters().get<std::vector<int>>("ONOFF");
+  const auto prefactors = cond->parameters().get<std::vector<double>>("PREFACTOR");
+  const auto reference_values = cond->parameters().get<std::vector<double>>("REFVALUE");
+  const auto function_ids =
+      cond->parameters().get<std::optional<std::vector<std::optional<int>>>>("FUNCT");
+  const double time = scatraparamstimint_->time();
 
-  // safety check
-  if ((int)(onoff.size()) != numscal_)
-  {
-    FOUR_C_THROW(
-        "Mismatch in size for Robin boundary conditions, onoff has length {}, but you have {} "
-        "scalars",
-        onoff.size(), numscal_);
-  }
-
-  // extract prefactor and reference value from condition
-  const auto prefac = cond->parameters().get<double>("PREFACTOR");
-  const auto refval = cond->parameters().get<double>("REFVALUE");
-
-  //////////////////////////////////////////////////////////////////////
-  //                  read nodal values
-  //////////////////////////////////////////////////////////////////////
-
-  std::vector<int>& lm = la[0].lm_;
-
-  // ------------get values of scalar transport------------------
-  // extract global state vector from discretization
-  std::shared_ptr<const Core::LinAlg::Vector<double>> phinp = discretization.get_state("phinp");
+  // get values of scalar transport: extract global state vector from discretization
+  const std::shared_ptr<const Core::LinAlg::Vector<double>> phinp =
+      discretization.get_state("phinp");
   if (phinp == nullptr) FOUR_C_THROW("Cannot read state vector \"phinp\" from discretization!");
 
-  // extract local nodal state variables from global state vector
-  std::vector<Core::LinAlg::Matrix<nen_, 1>> ephinp(
+  std::vector<Core::LinAlg::Matrix<nen_, 1>> element_phinp(
       numdofpernode_, Core::LinAlg::Matrix<nen_, 1>(Core::LinAlg::Initialization::zero));
-  Core::FE::extract_my_values<Core::LinAlg::Matrix<nen_, 1>>(*phinp, ephinp, lm);
+  const std::vector<int>& global_dof_numbers = la[0].lm_;
+  Core::FE::extract_my_values<Core::LinAlg::Matrix<nen_, 1>>(
+      *phinp, element_phinp, global_dof_numbers);
 
-  //////////////////////////////////////////////////////////////////////
-  //                  build RHS and StiffMat
-  //////////////////////////////////////////////////////////////////////
-
-  // integration points and weights
-  const Core::FE::IntPointsAndWeights<nsd_ele_> intpoints(
+  const Core::FE::IntPointsAndWeights<nsd_ele_> gauss_points(
       ScaTra::DisTypeToOptGaussRule<distype>::rule);
 
-  // loop over all scalars
-  for (int k = 0; k < numscal_; ++k)
+  for (int scalar_id = 0; scalar_id < numscal_; ++scalar_id)
   {
-    // flag for dofs to be considered by robin conditions
-    if (onoff[k] == 1)
+    if ((*onoff)[scalar_id] == 1)
     {
-      for (int gpid = 0; gpid < intpoints.ip().nquad; gpid++)
+      for (int gauss_point_id = 0; gauss_point_id < gauss_points.ip().nquad; gauss_point_id++)
       {
-        // evaluate values of shape functions and domain integration factor at current integration
-        // point
-        const double intfac =
-            Discret::Elements::ScaTraEleBoundaryCalc<distype, probdim>::eval_shape_func_and_int_fac(
-                intpoints, gpid);
+        // global coordinates of current Gauss point
+        Core::LinAlg::Matrix<nsd_, 1> gauss_point_coordinates;
+        gauss_point_coordinates.multiply_nn(xyze_, funct_);
 
-        // evaluate reference concentration factor
-        const double refconcfac = fac_for_ref_conc(gpid, ele, params, discretization);
-
-        // evaluate overall integration factors
-        const double fac_3 = prefac * intfac * refconcfac;
-
-        // evaluate current scalar at current integration point
-        const double phinp_gp = funct_.dot(ephinp[k]);
-
-        // build RHS and matrix
+        // factor given by spatial function
+        double function_value = 1.0;
+        if (function_ids.has_value())
         {
-          //////////////////////////////////////////////////////////////////////
-          //                  rhs
-          //////////////////////////////////////////////////////////////////////
-          const double vrhs = scatraparamstimint_->time_fac_rhs() * (phinp_gp - refval) * fac_3;
-
-          for (int vi = 0; vi < nen_; ++vi)
+          if (function_ids->at(scalar_id))
           {
-            const int fvi = vi * numscal_ + k;
-
-            elevec1[fvi] += vrhs * funct_(vi);
-          }
-
-          //////////////////////////////////////////////////////////////////////
-          //                  matrix
-          //////////////////////////////////////////////////////////////////////
-          for (int vi = 0; vi < nen_; ++vi)
-          {
-            const double vlhs = scatraparamstimint_->time_fac() * fac_3 * funct_(vi);
-            const int fvi = vi * numscal_ + k;
-
-            for (int ui = 0; ui < nen_; ++ui)
-            {
-              const int fui = ui * numdofpernode_ + k;
-
-              elemat1(fvi, fui) -= vlhs * funct_(ui);
-            }
+            function_value =
+                Global::Problem::instance()
+                    ->function_by_id<Core::Utils::FunctionOfSpaceTime>(*function_ids->at(scalar_id))
+                    .evaluate(gauss_point_coordinates.data(), time, scalar_id);
           }
         }
-      }  // loop over integration points
-    }  // if(onoff[k]==1)
-    // else //in the case of "OFF", a no flux condition is automatically applied
 
-  }  // loop over scalars
+        const double integration_factor =
+            ScaTraEleBoundaryCalc::eval_shape_func_and_int_fac(gauss_points, gauss_point_id);
+        const double reference_concentration_factor =
+            fac_for_ref_conc(gauss_point_id, ele, params, discretization);
+
+        const double pre_factor = prefactors[scalar_id] * integration_factor *
+                                  reference_concentration_factor * function_value;
+
+        // evaluate current scalar at current integration point
+        const double phinp_gp = funct_.dot(element_phinp[scalar_id]);
+
+        // fill RHS
+        const double vrhs = scatraparamstimint_->time_fac_rhs() *
+                            (phinp_gp - reference_values[scalar_id]) * pre_factor;
+        for (int vi = 0; vi < nen_; ++vi)
+        {
+          const int fvi = vi * numscal_ + scalar_id;
+          elevec1[fvi] += vrhs * funct_(vi);
+        }
+
+        // fill matrix
+        for (int vi = 0; vi < nen_; ++vi)
+        {
+          const double vlhs = scatraparamstimint_->time_fac() * pre_factor * funct_(vi);
+          const int fvi = vi * numscal_ + scalar_id;
+
+          for (int ui = 0; ui < nen_; ++ui)
+          {
+            const int fui = ui * numdofpernode_ + scalar_id;
+            elemat1(fvi, fui) -= vlhs * funct_(ui);
+          }
+        }
+      }
+    }
+  }
 }
 
 /*----------------------------------------------------------------------*

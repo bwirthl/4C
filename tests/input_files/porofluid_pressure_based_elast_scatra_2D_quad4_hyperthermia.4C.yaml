@@ -506,6 +506,15 @@ FUNCT23:
     NUMPOINTS: 2
     TIMES: [18000, 4.1472e+06]
     DESCRIPTION: ["1"]
+FUNCT24:
+  - COMPONENT: 0
+    SYMBOLIC_FUNCTION_OF_SPACE_TIME: "l"
+  - VARIABLE: 0
+    NAME: "l"
+    TYPE: "multifunction"
+    NUMPOINTS: 3
+    TIMES: [0, 18000, 4.1472e+06]
+    DESCRIPTION: ["0", "1"]
 RESULT DESCRIPTION:
   - SCATRA:
       DIS: "scatra"
@@ -529,13 +538,13 @@ RESULT DESCRIPTION:
       DIS: "scatra"
       NODE: 136
       QUANTITY: "phi7"
-      VALUE: 348.2757752760296
+      VALUE: 348.275772322811122
       TOLERANCE: 1e-12
   - SCATRA:
       DIS: "scatra"
       NODE: 129
       QUANTITY: "phi7"
-      VALUE: 348.27627342451484
+      VALUE: 348.276270471860641
       TOLERANCE: 1e-12
 DESIGN LINE DIRICH CONDITIONS:
   - E: 1
@@ -605,23 +614,27 @@ DESIGN TRANSPORT ROBIN LINE CONDITIONS:
   - E: 1
     NUMSCAL: 7
     ONOFF: [0, 0, 1, 0, 0, 0, 0]
-    PREFACTOR: -1.797e-07
-    REFVALUE: 0
+    PREFACTOR: [0, 0, -1.797e-07, 0, 0, 0, 0]
+    REFVALUE: [0, 0, 0, 0, 0, 0, 0]
+    FUNCT: [null, null, 24, null, null, null, null]
   - E: 2
     NUMSCAL: 7
     ONOFF: [0, 0, 1, 0, 0, 0, 0]
-    PREFACTOR: -1.797e-07
-    REFVALUE: 0
+    PREFACTOR: [0, 0, -1.797e-07, 0, 0, 0, 0]
+    REFVALUE: [0, 0, 0, 0, 0, 0, 0]
+    FUNCT: [null, null, 24, null, null, null, null]
   - E: 3
     NUMSCAL: 7
     ONOFF: [0, 0, 1, 0, 0, 0, 0]
-    PREFACTOR: -1.797e-07
-    REFVALUE: 0
+    PREFACTOR: [0, 0, -1.797e-07, 0, 0, 0, 0]
+    REFVALUE: [0, 0, 0, 0, 0, 0, 0]
+    FUNCT: [null, null, 24, null, null, null, null]
   - E: 4
     NUMSCAL: 7
     ONOFF: [0, 0, 1, 0, 0, 0, 0]
-    PREFACTOR: -1.797e-07
-    REFVALUE: 0
+    PREFACTOR: [0, 0, -1.797e-07, 0, 0, 0, 0]
+    REFVALUE: [0, 0, 0, 0, 0, 0, 0]
+    FUNCT: [null, null, 24, null, null, null, null]
 DNODE-NODE TOPOLOGY:
   - "NODE 156 DNODE 1"
   - "NODE 152 DNODE 2"

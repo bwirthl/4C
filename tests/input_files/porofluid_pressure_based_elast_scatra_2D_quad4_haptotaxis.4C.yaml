@@ -618,23 +618,23 @@ DESIGN TRANSPORT ROBIN LINE CONDITIONS:
   - E: 1
     NUMSCAL: 5
     ONOFF: [0, 0, 1, 0, 0]
-    PREFACTOR: -1.797e-07
-    REFVALUE: 0
+    PREFACTOR: [0, 0, -1.797e-07, 0, 0]
+    REFVALUE: [0, 0, 0, 0, 0]
   - E: 2
     NUMSCAL: 5
     ONOFF: [0, 0, 1, 0, 0]
-    PREFACTOR: -1.797e-07
-    REFVALUE: 0
+    PREFACTOR: [0, 0, -1.797e-07, 0, 0]
+    REFVALUE: [0, 0, 0, 0, 0]
   - E: 3
     NUMSCAL: 5
     ONOFF: [0, 0, 1, 0, 0]
-    PREFACTOR: -1.797e-07
-    REFVALUE: 0
+    PREFACTOR: [0, 0, -1.797e-07, 0, 0]
+    REFVALUE: [0, 0, 0, 0, 0]
   - E: 4
     NUMSCAL: 5
     ONOFF: [0, 0, 1, 0, 0]
-    PREFACTOR: -1.797e-07
-    REFVALUE: 0
+    PREFACTOR: [0, 0, -1.797e-07, 0, 0]
+    REFVALUE: [0, 0, 0, 0, 0]
 DNODE-NODE TOPOLOGY:
   - "NODE 156 DNODE 1"
   - "NODE 152 DNODE 2"

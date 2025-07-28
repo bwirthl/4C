@@ -213,13 +213,13 @@ DESIGN TRANSPORT ROBIN SURF CONDITIONS:
   - E: 1
     NUMSCAL: 8
     ONOFF: [0, 0, 1, 0, 0, 1, 0, 0]
-    PREFACTOR: -1
-    REFVALUE: 2
+    PREFACTOR: [0, 0, -1, 0, 0, -1, 0, 0]
+    REFVALUE: [0, 0, 2, 0, 0, 2, 0, 0]
   - E: 1
     NUMSCAL: 8
     ONOFF: [0, 0, 0, 0, 1, 0, 0, 0]
-    PREFACTOR: -1
-    REFVALUE: 0
+    PREFACTOR: [0, 0, 0, 0, -1, 0, 0, 0]
+    REFVALUE: [0, 0, 0, 0, 0, 0, 0, 0]
 DNODE-NODE TOPOLOGY:
   - "NODE 181 DNODE 1"
   - "NODE 1 DNODE 2"

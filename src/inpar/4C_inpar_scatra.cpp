@@ -446,6 +446,7 @@ void Inpar::ScaTra::set_valid_conditions(
     std::vector<Core::Conditions::ConditionDefinition>& condlist)
 {
   using namespace Core::IO::InputSpecBuilders;
+  using namespace Core::IO::InputSpecBuilders::Validators;
 
   /*--------------------------------------------------------------------*/
   // Boundary flux evaluation condition for scalar transport
@@ -549,8 +550,18 @@ void Inpar::ScaTra::set_valid_conditions(
     cond.add_component(parameter<int>("NUMSCAL"));
     cond.add_component(parameter<std::vector<int>>(
         "ONOFF", {.description = "", .size = from_parameter<int>("NUMSCAL")}));
-    cond.add_component(parameter<double>("PREFACTOR"));
-    cond.add_component(parameter<double>("REFVALUE"));
+    cond.add_component(parameter<std::vector<double>>(
+        "PREFACTOR", {.description = "Pre-factor for Robin boundary condition",
+                         .size = from_parameter<int>("NUMSCAL")}));
+    cond.add_component(parameter<std::vector<double>>(
+        "REFVALUE", {.description = "Reference value for Robin boundary condition",
+                        .size = from_parameter<int>("NUMSCAL")}));
+    cond.add_component(parameter<std::optional<std::vector<std::optional<int>>>>(
+        "FUNCT", {
+                     .description = "Function ID for Robin boundary condition",
+                     .size = from_parameter<int>("NUMSCAL"),
+                     // .validator = positive<int>(),
+                 }));
 
     condlist.emplace_back(cond);
   };
