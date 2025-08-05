@@ -10,6 +10,16 @@
 
 # four_c_test: regular .4C.yaml file based tests
 four_c_test(TEST_FILE beam3r_herm2line3_static_contact_penalty_with_positional_coupling.yaml NP 1)
+four_c_test(TEST_FILE porofluid_pressure_based_elast_scatra_2D_quad4_linebased_artery_coupling_vessel_collapse_teko.4C.yaml NP 2)
+four_c_test(TEST_FILE porofluid_pressure_based_elast_scatra_2D_quad4_linebased_artery_coupling_mono_MP_teko.4C.yaml NP 2)
+four_c_test(TEST_FILE porofluid_pressure_based_elast_scatra_3D_hex8_linebased_artery_coupling_mono_GPTS_teko.4C.yaml NP 2)
+four_c_test(TEST_FILE porofluid_pressure_based_elast_scatra_3D_tet4_surfbased_artery_coupling_mono_network_teko.4C.yaml NP 2)
+
+four_c_test(TEST_FILE porofluid_pressure_based_2D_quad4_linebased_artery_coupling_varying_radius_teko.4C.yaml NP 2)
+four_c_test(TEST_FILE porofluid_pressure_based_elast_scatra_3D_hex8_nodetopoint_artery_airway_coupling_mono_teko.4C.yaml NP 2)
+four_c_test(TEST_FILE porofluid_pressure_based_elast_scatra_2D_quad4_nodetopoint_artery_airway_coupling_mono_teko.4C.yaml NP 2)
+four_c_test(TEST_FILE porofluid_pressure_based_elast_scatra_3D_tet4_linebased_artery_coupling_mono_network_teko.4C.yaml NP 2)
+
 four_c_test(TEST_FILE ale2d_laplace_material.4C.yaml NP 2 RESTART_STEP 1)
 four_c_test(TEST_FILE ale2d_laplace_spatial.4C.yaml NP 2)
 four_c_test(TEST_FILE ale2d_solid.4C.yaml NP 2 RESTART_STEP 1)
