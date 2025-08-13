@@ -91,6 +91,12 @@ void Core::LinearSolver::TekoPreconditioner::setup(Epetra_Operator* matrix,
       {
         auto A_crs = Teuchos::make_rcp<Epetra_CrsMatrix>(*A->matrix(row, col).epetra_matrix());
         Teko::toBlockedLinearOp(pmatrix_)->setBlock(row, col, Thyra::epetraLinearOp(A_crs));
+
+        if (row == col)
+        {
+          std::cout << "row:" << row << " col:" << col << '\n';
+          A_crs->RowMap().Print(std::cout);
+        }
       }
     }
     Teko::toBlockedLinearOp(pmatrix_)->endBlockFill();
