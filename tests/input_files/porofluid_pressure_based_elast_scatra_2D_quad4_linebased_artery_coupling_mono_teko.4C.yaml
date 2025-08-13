@@ -17,6 +17,7 @@ porofluid_elasticity_scatra_dynamic:
 porofluid_elasticity_scatra_dynamic/monolithic:
   nonlinear_solver:
     linear_solver_id: 1
+    equilibration: rowsandcolumns_full
     residual:
       global_tolerance: 1e-07
     increment:
