@@ -290,6 +290,8 @@ Teuchos::ParameterList translate_four_c_to_belos(const Teuchos::ParameterList& i
   if (xmlfile)
   {
     beloslist.set("SOLVER_XML_FILE", xmlfile->string());
+    // required for adaptive linear solver tolerance
+    beloslist.set("Convergence Tolerance", inparams.get<double>("AZTOL"));
   }
   else
   {
