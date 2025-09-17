@@ -11,18 +11,14 @@
   <Parameter name="Inverse Type" type="string" value="Preconditioner"/>
   <ParameterList name="Inverse Factory Library">
     <ParameterList name="Preconditioner">
+      <Parameter name="verbosity" type="string" value="none"/>
       <Parameter name="Type" type="string" value="Block Gauss-Seidel"/>
       <Parameter name="Use Upper Triangle" type="bool" value="false"/>
       <Parameter name="Inverse Type 1" type="string" value="Inverse1"/>
       <Parameter name="Inverse Type 2" type="string" value="Inverse2"/>
-      <Parameter name="Inverse Type 3" type="string" value="Inverse3"/>
-    </ParameterList>
-    <!-- ===========  SINGLE FIELD PRECONDITIONER FOR STRUCTURE ================ -->
-    <ParameterList name="Inverse1">
-      <Parameter name="Type" type="string" value="Ifpack"/>
     </ParameterList>
     <!-- ===========  SINGLE FIELD PRECONDITIONER FOR FLUID ================ -->
-    <ParameterList name="Inverse2">
+    <ParameterList name="Inverse1">
       <Parameter name="Type" type="string" value="MueLu"/>
       <Parameter name="multigrid algorithm" type="string" value="pg"/>
       <Parameter name="max levels" type="int" value="3"/>
@@ -38,7 +34,7 @@
       </ParameterList>
     </ParameterList>
     <!-- ===========  SINGLE FIELD PRECONDITIONER FOR ARTERIES ================ -->
-    <ParameterList name="Inverse3">
+    <ParameterList name="Inverse2">
       <Parameter name="Type" type="string" value="MueLu"/>
       <Parameter name="multigrid algorithm" type="string" value="pg"/>
       <Parameter name="max levels" type="int" value="3"/>
